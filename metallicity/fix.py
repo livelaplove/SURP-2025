@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import seaborn as sns
 import pandas as pd
 import numpy as np
 
@@ -87,16 +86,19 @@ def readcsv(csv, x, hue, xbin, xbinlabel, huebin, huebinlabel):
 
     return df
 
-def boxplotdf(df, x, y, hue, xorder, hueorder, palette, figsize=(8,16)):
+def readdf(df, x, hue, xbin, xbinlabel, huebin, huebinlabel):
     '''
-    Creates boxplot.
+    Pandas dataframe version of readcsv.
     '''
 
-    plt.figure(figsize=figsize)
-    ax = sns.boxplot(data=df, x=x, y=y, orient='v', order=xorder, hue=hue, 
-                hue_order=hueorder, palette=palette, notch=False)
+    xbins = pd.cut(df[x], xbin, labels=xbinlabel, include_lowest=True)
+    huebins = pd.cut(df[hue], huebin, labels=huebinlabel, include_lowest=True)
 
-    return ax
+    df = df.drop([x, hue], axis=1)
+    df = df.merge(xbins, how='inner', left_index=True, right_index=True)
+    df = df.merge(huebins, how='inner', left_index=True, right_index=True)
+
+    return df
 
 def bprp_to_teff(bprp):
     """
@@ -130,12 +132,5 @@ def addteff(csv):
 
     return df
 
-def histogram(csv, x, nbins, title, figsize=(16,8)):
-    df = pd.read_csv(csv)
-
-    plt.figure(figsize=figsize)
-    ax = sns.histplot(data=df, x=x, bins=nbins)
-    ax.set_title(title, fontsize=18)
-    
-    bins = ax.hist(df[x], bins=nbins)
-    return ax, bins
+def findbincounts(df, upperbin, subbin):
+    return df.groupby(by=[subbin, upperbin]).size().reset_index(name='counts')
