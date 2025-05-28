@@ -71,14 +71,14 @@ def addboxcounts(ax, bincounts, size='x-small', color='w'):
 
     return None
 
-def histogram(csv, x, hue=None, title=None, nbins='auto', figsize=(16,8), binrange=None):
-    df = pd.read_csv(csv)
-
+def histogram(csv=None, df=None, x=None, hue=None, title=None, nbins='auto', figsize=(16,8), binrange=None):
+    if df == None:
+        df = pd.read_csv(csv)
+    
     plt.figure(figsize=figsize)
     ax = sns.histplot(data=df, x=x, hue=hue, bins=nbins, binrange=binrange)
     ax.set_title(title, fontsize=18)
     ax.minorticks_on()
-    ax.grid()
 
     bins = np.histogram(df[x], bins=nbins, range=binrange)
     return ax, bins
@@ -86,13 +86,13 @@ def histogram(csv, x, hue=None, title=None, nbins='auto', figsize=(16,8), binran
 def addhistcounts(ax, bincounts, size='small', color='w'):
     rects = [obj for obj in ax.get_children() if type (obj) == patches.Rectangle]
     for box, count in zip(rects, bincounts):
-        ax.text(box.get_x() + box.get_width() / 4 ,box.get_y() + 3 * box.get_height() / 4, count)
+        ax.text(box.get_x() + box.get_width() / 4 ,box.get_y() + 3 * box.get_height() / 4, count, size=size, color=color)
 
     return None
 
 def scatterplot(df, x, y, hue, hueorder, title, palette, show=False, figsize=(10,5)):
     plt.figure(figsize=figsize)
-    ax = sns.scatterplot(data=df, x=x, y=y, hue=hue, hue_order=hueorder, size=3, palette=palette, alpha=0.5)
+    ax = sns.scatterplot(data=df, x=x, y=y, hue=hue, hue_order=hueorder, size=1, palette=palette, alpha=0.5)
     ax.set_title(title, fontsize=18)
 
     if show == True:
@@ -100,5 +100,12 @@ def scatterplot(df, x, y, hue, hueorder, title, palette, show=False, figsize=(10
 
     return ax
 
-def manyscatterplots():
-    pass
+def manyscatterplots(df, x, xbin, y, hue, hueorder, palette, show=True, figsize=(10,8)):
+    for i in range(len(xbin) - 1):
+        sample = df[df[x] > xbin[i]]
+        sample = sample[sample[x] < xbin[i+1]]
+
+        title = f'Prot vs. teff ({xbin[i]}-{xbin[i+1]}) binned by Metallicity'
+        ax = scatterplot(sample, x, y, hue, hueorder, title=title, palette=palette, show=show, figsize=figsize)
+        ax.set_ylim(0, 160)
+        plt.savefig('example.png')

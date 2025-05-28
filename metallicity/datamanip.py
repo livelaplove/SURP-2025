@@ -123,11 +123,14 @@ def calcvzdisp(df, mhbinlabels, x=None, xbinlabels=None):
     if xbinlabels == None:
         for mhbin in mhbinlabels:
             sample = df.loc[df['mh_xgboost'] == mhbin]
-            vzdisp = round(stat.stdev(sample['vz']), 3)
+            if len(sample) < 2:
+                continue
+            else:
+                vzdisp = round(stat.stdev(sample['vz']), 3)
 
-            mhbins.append(mhbin)
-            samplesizes.append(len(sample))
-            vzdisps.append(vzdisp)
+                mhbins.append(mhbin)
+                samplesizes.append(len(sample))
+                vzdisps.append(vzdisp)
 
         return pd.DataFrame({'mh_xgboost':mhbins, 'samplesize':samplesizes, 'vzdisp':vzdisps})
             
@@ -139,12 +142,16 @@ def calcvzdisp(df, mhbinlabels, x=None, xbinlabels=None):
 
                 sample = df.loc[df['mh_xgboost'] == mhbin]
                 sample = sample.loc[df[x] == xbin]
-                vzdisp = round(stat.stdev(sample['vz']), 3)
+                if len(sample) < 2:
+                    continue
+                
+                else:
+                    vzdisp = round(stat.stdev(sample['vz']), 3)
 
-                xbins.append(xbin)
-                mhbins.append(mhbin)
-                samplesizes.append(len(sample))
-                vzdisps.append(vzdisp)
+                    xbins.append(xbin)
+                    mhbins.append(mhbin)
+                    samplesizes.append(len(sample))
+                    vzdisps.append(vzdisp)
 
         return pd.DataFrame({x:xbins, 'mh_xgboost':mhbins, 'samplesize':samplesizes, 'vzdisp':vzdisps})
     
