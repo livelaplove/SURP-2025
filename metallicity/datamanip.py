@@ -119,6 +119,7 @@ def calcvzdisp(df, mhbinlabels, x=None, xbinlabels=None):
     mhbins = []
     samplesizes = []
     vzdisps = []
+    means = []
 
     if xbinlabels == None:
         for mhbin in mhbinlabels:
@@ -127,12 +128,14 @@ def calcvzdisp(df, mhbinlabels, x=None, xbinlabels=None):
                 continue
             else:
                 vzdisp = round(stat.stdev(sample['vz']), 3)
+                mean = round(stat.mean(sample['Prot']), 3)
 
                 mhbins.append(mhbin)
                 samplesizes.append(len(sample))
                 vzdisps.append(vzdisp)
+                means.append(mean)
 
-        return pd.DataFrame({'mh_xgboost':mhbins, 'samplesize':samplesizes, 'vzdisp':vzdisps})
+        return pd.DataFrame({'mh_xgboost':mhbins, 'samplesize':samplesizes, 'vzdisp':vzdisps, 'meanprot':means})
             
     
     else:
@@ -147,11 +150,32 @@ def calcvzdisp(df, mhbinlabels, x=None, xbinlabels=None):
                 
                 else:
                     vzdisp = round(stat.stdev(sample['vz']), 3)
+                    mean = round(stat.mean(sample['Prot']), 3)
 
                     xbins.append(xbin)
                     mhbins.append(mhbin)
                     samplesizes.append(len(sample))
                     vzdisps.append(vzdisp)
+                    means.append(mean)
 
-        return pd.DataFrame({x:xbins, 'mh_xgboost':mhbins, 'samplesize':samplesizes, 'vzdisp':vzdisps})
-    
+        return pd.DataFrame({x:xbins, 'mh_xgboost':mhbins, 'samplesize':samplesizes, 'vzdisp':vzdisps, 'meanprot':means})
+
+def rescaleperiods(df, x, xbinlabels, mhbinlabels, refmhbin):
+    '''
+    Rescales periods of stars based on velocity dispersion per metallicity bin. 
+
+    The age of stars that form under similar sconditions can be correlated to the variance in their vertical velocities. 
+    Over time, external peturbations alter the motion of the star, changing this variance. Assuming a Skumanich relationship
+    between rotation period and age, velocity dispersion and age can be described with a similar relationship such that 
+    period and velocity disperion are directly proportional. Generally older stars are more metal poor. 
+
+    Within a temperature bin, mass bin, etc., the roation periods of the more metal poor stars can be adjusted to get conditions of 
+    the stars at roughly equal age. This point should be far enough into the lifecycle of a main-sequence star such that the 
+    inital conditions have converged. This function places the reference at star sof solar metallicity.
+    '''
+    pass
+
+one = pd.DataFrame({'one':[1, 2, 3], 'two':[1, 2, 3]})
+for i, value in enumerate(one['two'].values):
+    one['two'].values[i] *= 2
+print(one)
