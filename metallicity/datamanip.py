@@ -174,8 +174,3 @@ def rescaleperiods(df, x, xbinlabels, mhbinlabels, refmhbin):
     inital conditions have converged. This function places the reference at star sof solar metallicity.
     '''
     pass
-
-one = pd.DataFrame({'one':[1, 2, 3], 'two':[1, 2, 3]})
-for i, value in enumerate(one['two'].values):
-    one['two'].values[i] *= 2
-print(one)
